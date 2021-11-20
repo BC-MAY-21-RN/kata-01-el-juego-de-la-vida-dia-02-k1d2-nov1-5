@@ -1,206 +1,178 @@
-var row = 4, columns = 8 , i, j, n = 0
-var arrayCells
-var resultArrayCell
-var newArray
-
-
-
-
-//funcion que inicia el juego/simulacion
-function playgame() {
-    resultArrayCell = ''
-    createArrayCell()
-    for(i = 0; i < row; i++){
-        for(j = 0; j < columns; j++){
-          var ramdomGame = Math.random()
-          arrayCells[i][j] = checkCell(ramdomGame, arrayCells[i][j])
-          resultArrayCell +=  arrayCells[i][j].toString()
-        } 
-        resultArrayCell += '/n'
-      }
-      newArray = arrayCells
-      return resultArrayCell
-}
-
-function play(){
-  var resultGame = playgame()
-  let numberOfGenerations = 5
-  for( i = 0; i < numberOfGenerations; i++ ){
-    console.log("generacion:" + (i+1))
-    lookNeighbors(arrayCells)
-    let showRes = showResult(newArray)
-    console.log(showRes)
-    arrayCells = newArray
-  }
-}
-
-function getRows(){
-  return rows
-}
-
-function getColumns(){
-  return columns
-}
-
-function getArrayCell(){
-  return resultArrayCell
-}
-function getNewArray(){
-  return newArray
-}
-
-//checar si la celula esta viva o muerta
-function checkCell(ramdomGame, arrayCells) {
-  if(ramdomGame >= 0.5){
-    arrayCells = new Celula(0,0)
-  } else {
-    arrayCells = new Celula(1,0)
-  }
-  return arrayCells
-}
-
-//crea
-function createArrayCell(){
-  arrayCells = new Array(rows);
-  for (i = 0; i < arrayCells.length; i++) {
-      arrayCells[i] = new Array(columns);
-  }
-} 
-
-function lookNeighbors(EstatusCells) {
-  for(i = 0; i < EstatusCells.length; i++)
-    for(j = 0; j < EstatusCells[i].length; j++){
-      n = searchNeighbors(EstatusCells, neighbors, x, y)
-      EstatusCells[i][j].setNeighbors(neighbors)//set
-      rulesC(EstatusCells[i][j], x, y)
-    } 
-  
-}
-
-function searchNeighbors(EstatusCells, neighbors, x, y) {
-    for (i = -1; i <= 1; i++) {
-      for (j = -1; j <= 1; j++) {
-        try {
-          neighbors = searchNeighborsLive(EstatusCells[x + i][y + j], EstatusCellS[x][y] ,neighbors)
-        }
-        catch (e){
-          console.err('error')
-        }
-      }
-    
-    }
-    return neighbors
-  }
-
-  function searchNeighborsLive(EstatusCells, EstatusCellS, neighbors){
-    if (EstatusCells.getLife() == 1) {
-      if(EstatusCellS.getLife() == 1 && i==0 && j==0){
-          console.log('se conto solo');
-      }else{
-          neighbors++;
-      }
-  }
-  return neighbors;
-  }
-
-  function rulesC(cell,rows,columns){
-    if ((cell.getLife() == 1) && (cell.getNeighbors() < 2)) {
-      newArray[rows][columns].setLife(0);         // Soledad
-  } else if ((cell.getLife() == 1) && (cell.getNeighbors() > 3)) {
-      newArray[rows][columns].setLife(0);         // Sobrepoblación
-  } else if ((cell.getLife() == 0) && (cell.getNeighbors() == 3)) {
-      newArray[rows][columns].setLife(1);         // Reproducción
-  } else {
-      newArray[rows][columns] = cell;
-  }
-  }
-
-function showResult(array){
-    resultNewArray = ''
-    for ( i = 0; i < array.length; i++) {
-        for (let j = 0; j < array[i].length;  j++) {
-            resultNewArray += arrayCells[i][j].toString()
-        }
-        resultNewArray += '\n'
-    }
-    return resultNewArray
-}
-
-function sumTd (x,y){
-  return x + y
-}
-
-play();
-let newcell = new Celula(0, 4)
-
 class Celula {
-    constructor(live, neighbors) {
-      this.live = live
-      this.neighbors = neighbors
+    constructor(life, neighbors) {
+        this.life = life;
+        this.neighbors = neighbors;
     }
-    // 1 = life, 0 = dead
-    
-    getLive() {
-      return  this.live = live
+    // CONDICIONES PARA LA CELULA
+    // 1 = VIVO    0 = MUERTO
+    getLife() {
+        return this.life;
     }
-    setLive(live) {
-      this.live = live
-    } 
-    
+  
+    setLife(life){
+        this.life=life;
+    }
+  
+    setNeighbors(Neighbors) {
+        this.neighbors = Neighbors;
+    }
+  
+    toString() {
+        if (this.life == 0) {
+            return '.';
+        } else {
+            return '*';
+        }
+    }
+  
     getNeighbors() {
-        return  this.neighbors = neighbors
+        return this.neighbors;
     }
-
-    setNeighbors(neighbors) {
-        this.neighbors = neighbors
-    }
-    
-    deadLive() {
-      if(this.live == 0){
-        return '.'
-      } else{
-        return '*'
+  
+  };
+  
+  
+  let rows = 4, columns = 8;
+  var resultArrayCell = '';
+  var resutNewArray = '';
+  var newArray;
+  var cell;
+  let arrayCells;
+  let loopControler=0;
+  
+  function getRows(){
+      return rows;
+  }
+  
+  function getColumns(){
+      return columns;
+  }
+  
+  function getArrayCell(){
+      return resultArrayCell;
+  }
+  function getNewArray(){
+      return newArray;
+  }
+  
+  function play(){
+      var resultGame = playGame();
+      let numberOfGenerations = 5;
+      for(let i = 0; i < numberOfGenerations; i++ ){
+          console.log("generacion:" + (i+1));
+          iteration(arrayCells)
+          let showRes = showResult(newArray);
+          console.log(showRes);
+          arrayCells = newArray;
       }
-    }
-}
-
-module.exports = {
-  play,
-  playgame,
-  lookNeighbors,
-  rulesC,
-  showResult,
-  getRows,
-  getColumns,
-  getArrayCell,
-  sumTd,
-  getNewArray,
-}
-
-
-
-
-// Autores y coautores para el commit
-// Co-authored-by: xManuel007  <maanuu.009@gmail.com>
-// Co-authored-by: OsvaldoMDLM <osvaldo.benjamin31@gmail.com>
-// Co-authored-by: richi0719   <ricardojuarezhernandez07@gmail.com>
-// Co-authored-by: RichyVaca  <ric_vaca_9519@outlook.com>
-// Co-authored-by:       <>
-
-
-
-// ⠸⣷⣦⠤⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣠⣤⠀⠀⠀
-// ⠀⠙⣿⡄⠈⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⠔⠊⠉⣿⡿⠁⠀⠀⠀
-// ⠀⠀⠈⠣⡀⠀⠀⠑⢄⠀⠀⠀⠀⠀⠀⠀⠀⠀⡠⠊⠁⠀⠀⣰⠟⠀⠀⠀⣀⣀
-// ⠀⠀⠀⠀⠈⠢⣄⠀⡈⠒⠊⠉⠁⠀⠈⠉⠑⠚⠀⠀⣀⠔⢊⣠⠤⠒⠊⠉⠀⡜
-// ⠀⠀⠀⠀⠀⠀⠀⡽⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⡔⠊⠁⠀⠀⠀⠀⠀⠀⠇
-// ⠀⠀⠀⠀⠀⠀⠀⡇⢠⡤⢄⠀⠀⠀⠀⠀⡠⢤⣄⠀⡇⠀⠀⠀⠀⠀⠀⠀⢰⠀
-// ⠀⠀⠀⠀⠀⠀⢀⠇⠹⠿⠟⠀⠀⠤⠀⠀⠻⠿⠟⠀⣇⠀⠀⡀⠠⠄⠒⠊⠁⠀
-// ⠀⠀⠀⠀⠀⠀⢸⣿⣿⡆⠀⠰⠤⠖⠦⠴⠀⢀⣶⣿⣿⠀⠙⢄⠀⠀
-// ⠀⠀⠀⠀⠀⠀⠀⢻⣿⠃⠀⠀⠀⠀⠀⠀⠀⠈⠿⡿⠛⢄⠀⠀⠱⣄⠀⠀
-// ⠀⠀⠀⠀⠀⠀⠀⢸⠈⠓⠦⠀⣀⣀⣀⠀⡠⠴⠊⠹⡞⣁⠤⠒⠉⠀⠀
-// ⠀⠀⠀⠀⠀⠀⣠⠃⠀⠀⠀⠀⡌⠉⠉⡤⠀⠀⠀⠀⢻⠿⠆⠀⠀⠀⠀
-// ⠀⠀⠀⠀⠀⠰⠁⡀⠀⠀⠀⠀⢸⠀⢰⠃⠀⠀⠀⢠⠀⢣⠀⠀⠀⠀⠀
-// ⠀⠀⠀⢶⣗⠧⡀⢳⠀⠀⠀⠀⢸⣀⣸⠀⠀⠀⢀⡜⠀⣸⢤⣶⠀
-// ⠀⠀⠀⠈⠻⣿⣦⣈⣧⡀⠀⠀⢸⣿⣿⠀⠀⢀⣼⡀⣨⣿⡿⠁⠀
-// ⠀⠀⠀⠀⠀⠈⠻⠿⠿⠓⠄⠤⠘⠉⠙⠤⢀⠾⠿⣿⠟⠋
+  }
+  
+  function playGame(){
+      resultArrayCell = '';
+      createArrayCell();
+      for (let x = 0; x < rows; x++) {
+          for (let y = 0; y < columns; y++) {
+              var ramdomGame = Math.random();
+              arrayCells[x][y] = checkramdomGame( ramdomGame, arrayCells[x][y]);
+              resultArrayCell+= arrayCells[x][y].toString();
+          }
+          resultArrayCell += '\n';
+      }
+      newArray=arrayCells;
+      return resultArrayCell;
+  }
+  
+  function createArrayCell(){
+      arrayCells = new Array(rows);
+      for (i = 0; i < arrayCells.length; i++) {
+          arrayCells[i] = new Array(columns);
+      }
+  } 
+  
+  function checkramdomGame(ramdomGame, arrayCells){
+      if (ramdomGame >= 0.5) { 
+          arrayCells = new Celula(0, 0);
+      } 
+      else { 
+          arrayCells =  new Celula(1, 0);   
+      }
+      return arrayCells;
+  }
+  
+  function iteration(EstatusCells){
+      for (var x = 0; x < EstatusCells.length; x++) {
+          for (var y = 0; y < EstatusCells[x].length; y++) {
+              let neighbors = 0;
+              neighbors = countNeighborsAround(EstatusCells, neighbors, x, y)            
+              EstatusCells[x][y].setNeighbors(neighbors);
+              rulesCell(EstatusCells[x][y],x,y);
+          }
+      }
+  }
+  
+  function countNeighborsAround(EstatusCells, neighbors, x, y){
+      for (let i = -1; i <= 1; i++) {
+          for (let j = -1; j <= 1; j++) {
+              try { 
+                  neighbors = cheackIfNeighborIsLife(EstatusCells[x + i][y + j], EstatusCells[x][y], neighbors)                   
+              } catch (e) {
+                  
+              }
+          }
+      }
+      return neighbors;
+  }
+  
+  function cheackIfNeighborIsLife(EstatusCellsAround, EstatusCellsSimple, neighbors){
+      if (EstatusCellsAround.getLife() == 1) {
+          if(EstatusCellsSimple.getLife() == 1 && i==0 && j==0){
+              console.log('se conto solo');
+          }else{
+              neighbors++;
+          }
+      }
+      return neighbors;
+  } 
+  
+  function rulesCell(cell,rows,columns) {    
+      if ((cell.getLife() == 1) && (cell.getNeighbors() < 2)) {
+          newArray[rows][columns].setLife(0);         // Soledad
+      } else if ((cell.getLife() == 1) && (cell.getNeighbors() > 3)) {
+          newArray[rows][columns].setLife(0);         // Sobrepoblación
+      } else if ((cell.getLife() == 0) && (cell.getNeighbors() == 3)) {
+          newArray[rows][columns].setLife(1);         // d
+      } else {
+          newArray[rows][columns] = cell;
+      }
+  }
+  
+  function showResult(array){
+      resultNewArray = '';
+      for ( i = 0; i < array.length; i++) {
+          for (let j = 0; j < array[i].length;  j++) {
+              resultNewArray += arrayCells[i][j].toString();
+          }
+          resultNewArray += '\n';
+      }
+      return resultNewArray;
+  }
+  
+  function sumTd (x,y){
+      return x + y;
+  }
+  
+  play();
+  let newcell = new Celula(0, 4);
+  
+  module.exports = {
+      newcell,
+      playGame,
+      iteration,
+      rulesCell,
+      showResult,
+      getRows,
+      getColumns,
+      getArrayCell,
+      sumTd,
+      getNewArray,
+  }
